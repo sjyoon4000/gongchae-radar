@@ -61,7 +61,7 @@ if(location.protocol!=='file:'){refresh();setInterval(refresh,10*60*1000);if('se
   if(!admob)return;
   try {
     await admob.initialize({initializeForTesting:false});
-    await admob.showBanner({adId:'ca-app-pub-5012191593754335/4281985111',adSize:'ADAPTIVE_BANNER',position:'BOTTOM_CENTER',margin:0,isTesting:false});
+    await admob.showBanner({adId:'ca-app-pub-5012191593754335/4281985111',adSize:'ADAPTIVE_BANNER',position:'BOTTOM_CENTER',margin:0,isTesting:true});
   } catch(e) { console.warn('AdMob banner unavailable',e); }
 })();
 </script>
