@@ -1,11 +1,12 @@
 {
-  "version": "2026-10-29-deploy-v9",
+  "version": "2026-10-29-cartok",
   "market": {
     "date": "2026-10-29",
     "metro": 15.44,
     "regional": 11.146,
-    "source": "Cartok 사용자 제공 화면(2026-10-29) · 자동수집 미검증",
-    "verifiedAutomated": false
+    "source": "Cartok 공채정보 (자동 수집 · 지역별 실제 할인율 차이 유의)",
+    "verifiedAutomated": true,
+    "collectedAt": "2026-10-29T21:48:27+09:00"
   },
   "regions": {
     "서울": {
@@ -656,6 +657,21 @@
       "date": "2026-10-21",
       "metro": 15.63,
       "regional": 11.406
+    },
+    {
+      "date": "2026-10-20",
+      "metro": 15.815,
+      "regional": 11.561
+    },
+    {
+      "date": "2026-10-19",
+      "metro": 15.612,
+      "regional": 11.397
+    },
+    {
+      "date": "2026-10-16",
+      "metro": 15.827,
+      "regional": 11.553
     }
   ]
 }
