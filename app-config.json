@@ -1,5 +1,5 @@
 {
-  "dataUrl": "",
+  "dataUrl": "https://sjyoon4000.github.io/gongchae-radar/data.json",
   "adsEnabled": false,
-  "note": "배포 후 실제 HTTPS 주소 설정 필요. 미설정 시 내장된 2026-10-29 수동 확인 자료만 표시"
+  "note": "공채레이더 공개 데이터 URL. 네이티브 AdMob 광고는 Android 앱에서 별도 구성하며 웹 배너는 비활성화."
 }
