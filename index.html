@@ -59,6 +59,8 @@ if(location.protocol!=='file:'){refresh();setInterval(refresh,10*60*1000);if('se
   if(!window.Capacitor?.isNativePlatform?.() || window.Capacitor.getPlatform()!=='android')return;
   const admob=window.Capacitor.Plugins?.AdMob;
   if(!admob)return;
+  // Keep the final content scrollable above the native anchored banner.
+  document.body.style.paddingBottom='110px';
   try {
     await admob.initialize({initializeForTesting:false});
     await admob.showBanner({adId:'ca-app-pub-5012191593754335/4281985111',adSize:'ADAPTIVE_BANNER',position:'BOTTOM_CENTER',margin:0,isTesting:true});
