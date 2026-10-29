@@ -5,8 +5,8 @@ import requests
 from bs4 import BeautifulSoup
 
 URL='http://www.cartok.com/getSubMenuLoad.do?sub_menu_id=gongchae&sub_menu_val=1'
-ROOT=pathlib.Path(__file__).resolve().parents[1]
-DATA=ROOT/'www'/'data.json'
+ROOT=pathlib.Path(__file__).resolve().parent
+DATA=ROOT/'data.json'
 
 def parse(html):
     soup=BeautifulSoup(html,'html.parser')
