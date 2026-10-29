@@ -11,6 +11,18 @@
 /* Future ad area: reserved but hidden until a real ad integration is approved. */
 #ad-slot{display:none;min-height:58px;max-width:820px;margin:10px auto 0;padding:8px 12px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center}
 #ad-slot.enabled{display:block}#ad-slot .ad-label{font-size:10px;color:#64748b}
+
+/* Compact mobile rates table: four columns visible without horizontal scrolling. */
+.rates-wrap{overflow-x:visible}
+.rates-wrap table{min-width:0;width:100%;table-layout:fixed;font-size:12px}
+.rates-wrap th,.rates-wrap td{padding:9px 3px;overflow-wrap:anywhere;word-break:keep-all;line-height:1.4}
+.rates-wrap th:nth-child(1),.rates-wrap td:nth-child(1){width:20%}
+.rates-wrap th:nth-child(2),.rates-wrap td:nth-child(2){width:34%}
+.rates-wrap th:nth-child(3),.rates-wrap td:nth-child(3){width:28%}
+.rates-wrap th:nth-child(4),.rates-wrap td:nth-child(4){width:18%}
+.rates-wrap .pill{padding:5px 6px;font-size:10px;white-space:normal}
+.rates-wrap .rate{font-size:13px}
+@media(max-width:390px){.rates-wrap table{font-size:11px}.rates-wrap th,.rates-wrap td{padding:8px 2px}.rates-wrap .rate{font-size:12px}.rates-wrap .pill{font-size:9px;padding:4px}}
 </style><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"></head>
 <body>
 <div id="ad-slot" aria-label="광고 영역"><div class="ad-label">광고</div><div id="ad-content"></div></div>
@@ -26,7 +38,7 @@
  <div class="apply"><strong id="applied">경기도 · 지역개발채권 12.790</strong><div class="small">선택 지역에 실제 적용되는 채권을 파란색으로 표시합니다.</div></div>
  </section>
 <section class="card"><div class="status"><div><div class="section-title" id="regionTitle">경기도 신차 매입률</div><div class="muted" id="bondName">지역개발채권</div></div><span class="pill">신규등록</span></div>
- <div class="table-wrap"><table style="margin-top:10px"><thead><tr><th>차종</th><th>기준</th><th>매입률</th><th>확인상태</th></tr></thead><tbody id="rates"></tbody></table></div>
+ <div class="table-wrap rates-wrap"><table style="margin-top:10px"><thead><tr><th>차종</th><th>기준</th><th>매입률</th><th>확인상태</th></tr></thead><tbody id="rates"></tbody></table></div>
 </section>
 <section class="note"><b>중요</b><br>채권 <b>시세</b>는 의무매입한 채권을 즉시 매도할 때 적용되는 당일 시장가격이고, <b>매입률</b>은 차량 등록 시 의무적으로 매입하는 기준입니다. 자동차365도 공채 할인율은 수시로 변동하고 지역별 차이가 있으므로 정확한 현재 할인액은 해당 지자체 시금고 등에 확인하도록 안내합니다.</section>
 <section class="card"><div class="section-title">📈 최근 7거래일 시세</div><div class="table-wrap"><table style="min-width:0"><thead><tr><th>날짜</th><th>도시철도</th><th>지역개발</th></tr></thead><tbody id="history"></tbody></table></div></section>
