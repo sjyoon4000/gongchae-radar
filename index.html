@@ -52,4 +52,17 @@ const url=(cfg.dataUrl && /^https:\/\//.test(cfg.dataUrl)) ? cfg.dataUrl : 'data
 const res=await fetch(url+(url.includes('?')?'&':'?')+'ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error();const fresh=await res.json();if(!fresh?.market?.date || !Number.isFinite(Number(fresh.market.metro)) || !Number.isFinite(Number(fresh.market.regional)) || !fresh.regions?.[$('region').value])throw new Error('잘못된 데이터');DATA=fresh;render();$('statusPill').textContent=fresh.market?.verifiedAutomated?'자동수집 자료 · '+fresh.market.date:'수동 확인 자료 · '+fresh.market.date}catch(e){$('statusPill').textContent='최신 데이터 조회 실패 · 기준일 확인';$('statusPill').className='pill badge-ref'}}
 $('region').onchange=render;$('refresh').onclick=refresh;render();if(location.protocol!=='file:')refresh();
 if(location.protocol!=='file:'){refresh();setInterval(refresh,10*60*1000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})}
-</script></body></html>
+</script>
+<script>
+// AdMob is initialized only in the installed Android app, never on the public website.
+(async function initAndroidBanner(){
+  if(!window.Capacitor?.isNativePlatform?.() || window.Capacitor.getPlatform()!=='android')return;
+  const admob=window.Capacitor.Plugins?.AdMob;
+  if(!admob)return;
+  try {
+    await admob.initialize({initializeForTesting:false});
+    await admob.showBanner({adId:'ca-app-pub-5012191593754335/4281985111',adSize:'ADAPTIVE_BANNER',position:'BOTTOM_CENTER',margin:0,isTesting:false});
+  } catch(e) { console.warn('AdMob banner unavailable',e); }
+})();
+</script>
+</body></html>
