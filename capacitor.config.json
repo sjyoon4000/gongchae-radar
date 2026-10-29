@@ -1,0 +1,6 @@
+{
+  "appId": "com.gongchaeradar.mobile",
+  "appName": "공채레이더",
+  "webDir": "www",
+  "server": {"androidScheme": "https"}
+}

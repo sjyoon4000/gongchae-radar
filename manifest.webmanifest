@@ -1,0 +1,1 @@
+{"name": "신차 등록채권 요율조회", "short_name": "공채요율", "start_url": "./", "scope": "./", "display": "standalone", "background_color": "#f3f5f7", "theme_color": "#0f172a", "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]}
