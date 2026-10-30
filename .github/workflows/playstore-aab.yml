@@ -19,22 +19,11 @@ jobs:
         run: |
           mkdir -p www
           cp index.html app-config.json data.json icon.svg manifest.webmanifest sw.js www/
-      - name: Reserve native status bar space inside the app header
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('www/index.html')
-          html=p.read_text()
-          css='<style id="android-status-bar-clearance">header{padding-top:calc(22px + 44px)!important}</style>'
-          assert '</head>' in html
-          p.write_text(html.replace('</head>',css+'\n</head>',1))
-          print('Android header clearance applied: +44 CSS pixels')
-          PY
       - name: Install and create Android project
         run: |
           npm install
           npx cap add android
-      - name: Respect Android system status and navigation bars
+      - name: Apply Android edge-to-edge window insets to WebView
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -58,11 +47,17 @@ jobs:
               @Override
               public void onCreate(Bundle savedInstanceState) {{
                   super.onCreate(savedInstanceState);
-                  // Keep the WebView below the system status bar.
-                  WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+                  WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
                   getWindow().setStatusBarColor(0xFF0F172A);
                   getWindow().getDecorView().setSystemUiVisibility(0);
-                  getBridge().getWebView().setBackgroundColor(0xFF0F172A);
+                  View webView=getBridge().getWebView();
+                  webView.setBackgroundColor(0xFF0F172A);
+                  ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {{
+                      androidx.core.graphics.Insets bars=insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+                      v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                      return insets;
+                  }});
+                  ViewCompat.requestApplyInsets(webView);
               }}
           }}
           ''')
