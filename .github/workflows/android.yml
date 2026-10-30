@@ -80,7 +80,7 @@ jobs:
               icon.save(folder/'ic_launcher_round.png')
               (folder/'ic_launcher_foreground.png').unlink(missing_ok=True)
           # Replace Capacitor adaptive icons, which otherwise take precedence on modern Android.
-          for folder in [root/'mipmap-anydpi-v26',root/'mipmap-anydpi']:
+          for folder in [root/'mipmap-anydpi-v26']:
               folder.mkdir(parents=True,exist_ok=True)
               for name in ['ic_launcher.xml','ic_launcher_round.xml']:
                   (folder/name).write_text('''<?xml version="1.0" encoding="utf-8"?>
@@ -92,6 +92,8 @@ jobs:
           values=root/'values'
           values.mkdir(parents=True,exist_ok=True)
           (values/'gongchae_icon_colors.xml').write_text('<resources><color name="gongchae_icon_background">#0F172A</color></resources>')
+          for legacy in ['ic_launcher.xml','ic_launcher_round.xml']:
+              (root/'mipmap-anydpi'/legacy).unlink(missing_ok=True)
           drawable=root/'drawable'
           drawable.mkdir(parents=True,exist_ok=True)
           # Center the complete icon within the adaptive safe zone to avoid clipping.
