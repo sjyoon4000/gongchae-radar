@@ -64,6 +64,20 @@ jobs:
                       return insets;
                   }});
                   ViewCompat.requestApplyInsets(content);
+                  // Reserve a real native viewport area for the bottom AdMob banner.
+                  // A CSS body padding only helps at the end of scrolling; it does not
+                  // prevent the banner from covering content mid-scroll.
+                  final float density=getResources().getDisplayMetrics().density;
+                  final int adSpace=Math.round(64*density);
+                  webView.post(() -> {{
+                      android.view.ViewGroup.LayoutParams lp=webView.getLayoutParams();
+                      if(lp instanceof android.view.ViewGroup.MarginLayoutParams) {{
+                          android.view.ViewGroup.MarginLayoutParams mlp=
+                              (android.view.ViewGroup.MarginLayoutParams)lp;
+                          mlp.bottomMargin=adSpace;
+                          webView.setLayoutParams(mlp);
+                      }}
+                  }});
               }}
           }}
           ''')
