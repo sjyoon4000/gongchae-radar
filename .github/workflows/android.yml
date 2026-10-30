@@ -41,7 +41,6 @@ jobs:
           import android.os.Bundle;
           import android.view.View;
           import androidx.core.view.ViewCompat;
-          import androidx.core.view.WindowCompat;
           import androidx.core.view.WindowInsetsCompat;
           import com.getcapacitor.BridgeActivity;
 
@@ -49,9 +48,6 @@ jobs:
               @Override
               public void onCreate(Bundle savedInstanceState) {{
                   super.onCreate(savedInstanceState);
-                  WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-                  getWindow().setStatusBarColor(0xFF0F172A);
-                  getWindow().getDecorView().setSystemUiVisibility(0);
                   View webView=getBridge().getWebView();
                   webView.setBackgroundColor(0xFF0F172A);
                   // Keep the original edge-to-edge status bar appearance as requested.
