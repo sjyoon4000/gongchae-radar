@@ -52,12 +52,18 @@ jobs:
                   getWindow().getDecorView().setSystemUiVisibility(0);
                   View webView=getBridge().getWebView();
                   webView.setBackgroundColor(0xFF0F172A);
-                  ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {{
-                      androidx.core.graphics.Insets bars=insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+                  // Apply system insets to the native content container, NOT the WebView.
+                  // WebView padding does not reliably offset its rendered HTML viewport.
+                  View content=findViewById(android.R.id.content);
+                  ViewCompat.setOnApplyWindowInsetsListener(content, (v, insets) -> {{
+                      androidx.core.graphics.Insets bars=insets.getInsets(
+                          WindowInsetsCompat.Type.statusBars()
+                          | WindowInsetsCompat.Type.navigationBars()
+                          | WindowInsetsCompat.Type.displayCutout());
                       v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
                       return insets;
                   }});
-                  ViewCompat.requestApplyInsets(webView);
+                  ViewCompat.requestApplyInsets(content);
               }}
           }}
           ''')
@@ -101,6 +107,12 @@ jobs:
           drawable.mkdir(parents=True,exist_ok=True)
           # Center the complete icon within the adaptive safe zone to avoid clipping.
           canvas=Image.new('RGBA',(432,432),(0,0,0,0))
+          # Crop outer padding from source artwork, then fit within Android's safe zone.
+          # This enlarges the logo without exceeding the adaptive icon mask.
+          side=min(src.width,src.height)
+          inset=round(side*0.11)
+          cx,cy=src.width//2,src.height//2
+          src=src.crop((cx-side//2+inset,cy-side//2+inset,cx+side//2-inset,cy+side//2-inset))
           art=src.resize((288,288),Image.Resampling.LANCZOS)
           canvas.alpha_composite(art,(72,72))
           canvas.save(drawable/'gongchae_icon_foreground.png')
