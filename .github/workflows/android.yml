@@ -62,18 +62,48 @@ jobs:
           }}
           ''')
           PY
-      - name: Apply custom launcher icon
+      - name: Generate all Android launcher icon resources
         run: |
           python3 -m pip install --user Pillow
           python3 - <<'PY'
-          from PIL import Image
+          from PIL import Image, ImageDraw
           from pathlib import Path
-          im=Image.open('playstore-icon.png').convert('RGBA')
+          from xml.etree import ElementTree as ET
+          src=Image.open('playstore-icon.png').convert('RGBA')
+          assert src.width>=512 and src.height>=512, 'Play Store icon must be at least 512x512'
+          root=Path('android/app/src/main/res')
           for density,px in [('mdpi',48),('hdpi',72),('xhdpi',96),('xxhdpi',144),('xxxhdpi',192)]:
-              p=Path(f'android/app/src/main/res/mipmap-{density}')
-              p.mkdir(parents=True,exist_ok=True)
-              im.resize((px,px),Image.Resampling.LANCZOS).save(p/'ic_launcher.png')
-              im.resize((px,px),Image.Resampling.LANCZOS).save(p/'ic_launcher_round.png')
+              folder=root/f'mipmap-{density}'
+              folder.mkdir(parents=True,exist_ok=True)
+              icon=src.resize((px,px),Image.Resampling.LANCZOS)
+              icon.save(folder/'ic_launcher.png')
+              icon.save(folder/'ic_launcher_round.png')
+              (folder/'ic_launcher_foreground.png').unlink(missing_ok=True)
+          # Replace Capacitor adaptive icons, which otherwise take precedence on modern Android.
+          for folder in [root/'mipmap-anydpi-v26',root/'mipmap-anydpi']:
+              folder.mkdir(parents=True,exist_ok=True)
+              for name in ['ic_launcher.xml','ic_launcher_round.xml']:
+                  (folder/name).write_text('''<?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+            <background android:drawable="@color/gongchae_icon_background" />
+            <foreground android:drawable="@drawable/gongchae_icon_foreground" />
+          </adaptive-icon>
+          ''')
+          values=root/'values'
+          values.mkdir(parents=True,exist_ok=True)
+          (values/'gongchae_icon_colors.xml').write_text('<resources><color name="gongchae_icon_background">#0F172A</color></resources>')
+          drawable=root/'drawable'
+          drawable.mkdir(parents=True,exist_ok=True)
+          # Center the complete icon within the adaptive safe zone to avoid clipping.
+          canvas=Image.new('RGBA',(432,432),(0,0,0,0))
+          art=src.resize((288,288),Image.Resampling.LANCZOS)
+          canvas.alpha_composite(art,(72,72))
+          canvas.save(drawable/'gongchae_icon_foreground.png')
+          manifest=Path('android/app/src/main/AndroidManifest.xml')
+          txt=manifest.read_text()
+          assert 'android:icon="@mipmap/ic_launcher"' in txt
+          assert 'android:roundIcon="@mipmap/ic_launcher_round"' in txt
+          print('Verified launcher icons: legacy + adaptive, both mapped in AndroidManifest')
           PY
       - name: Configure Android AdMob app ID
         run: |
