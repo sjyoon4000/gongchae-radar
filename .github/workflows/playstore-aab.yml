@@ -163,6 +163,19 @@ jobs:
           p.write_text(updated)
           print('Set minSdkVersion=24 for Google Play automatic protection')
           PY
+      - name: Set unique Play Store version code
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('android/app/build.gradle')
+          s=p.read_text()
+          code=int("${{ github.run_number }}")+1
+          updated,n=re.subn(r'versionCode\s+\d+', f'versionCode {code}', s)
+          assert n==1, f'Expected one versionCode, found {n}'
+          p.write_text(updated)
+          print(f'Play Store versionCode={code}')
+          PY
       - name: Build release bundle
         working-directory: android
         run: chmod +x gradlew && ./gradlew bundleRelease --no-daemon
