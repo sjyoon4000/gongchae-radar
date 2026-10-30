@@ -23,7 +23,7 @@ jobs:
         run: |
           npm install
           npx cap add android
-      - name: Apply Android edge-to-edge window insets to WebView
+      - name: Preserve edge-to-edge status bar and protect bottom banner
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -52,15 +52,13 @@ jobs:
                   getWindow().getDecorView().setSystemUiVisibility(0);
                   View webView=getBridge().getWebView();
                   webView.setBackgroundColor(0xFF0F172A);
-                  // Apply system insets to the native content container, NOT the WebView.
-                  // WebView padding does not reliably offset its rendered HTML viewport.
+                  // Keep the original edge-to-edge status bar appearance as requested.
+                  // Only protect the bottom navigation area; do not offset the top content.
                   View content=findViewById(android.R.id.content);
                   ViewCompat.setOnApplyWindowInsetsListener(content, (v, insets) -> {{
-                      androidx.core.graphics.Insets bars=insets.getInsets(
-                          WindowInsetsCompat.Type.statusBars()
-                          | WindowInsetsCompat.Type.navigationBars()
-                          | WindowInsetsCompat.Type.displayCutout());
-                      v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                      androidx.core.graphics.Insets nav=insets.getInsets(
+                          WindowInsetsCompat.Type.navigationBars());
+                      v.setPadding(0, 0, 0, nav.bottom);
                       return insets;
                   }});
                   ViewCompat.requestApplyInsets(content);
