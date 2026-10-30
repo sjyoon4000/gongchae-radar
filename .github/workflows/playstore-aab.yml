@@ -158,7 +158,7 @@ jobs:
           import re
           p=Path('android/variables.gradle')
           s=p.read_text()
-          updated,n=re.subn(r'minSdkVersion\\s*=\\s*\\d+', 'minSdkVersion = 24', s)
+          updated,n=re.subn(r'minSdkVersion\s*=\s*\d+', 'minSdkVersion = 24', s)
           assert n==1, f'Expected one minSdkVersion in {p}, found {n}'
           p.write_text(updated)
           print('Set minSdkVersion=24 for Google Play automatic protection')
