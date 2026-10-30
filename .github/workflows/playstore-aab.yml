@@ -23,6 +23,43 @@ jobs:
         run: |
           npm install
           npx cap add android
+      - name: Respect Android system status and navigation bars
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          files=list(Path('android/app/src/main/java').rglob('MainActivity.java'))
+          assert len(files)==1, f'Expected one MainActivity.java, got {files}'
+          p=files[0]
+          src=p.read_text()
+          package=re.search(r'^package\\s+([\\w.]+);',src,re.M)
+          assert package, 'Cannot identify Android package'
+          p.write_text(f'''package {package.group(1)};
+
+          import android.os.Bundle;
+          import android.view.View;
+          import androidx.core.view.ViewCompat;
+          import androidx.core.view.WindowCompat;
+          import androidx.core.view.WindowInsetsCompat;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {{
+              @Override
+              public void onCreate(Bundle savedInstanceState) {{
+                  super.onCreate(savedInstanceState);
+                  WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+                  View webView = getBridge().getWebView();
+                  webView.setBackgroundColor(0xFF0F172A);
+                  ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {{
+                      androidx.core.graphics.Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                      view.setPadding(0, bars.top, 0, bars.bottom);
+                      return insets;
+                  }});
+                  ViewCompat.requestApplyInsets(webView);
+              }}
+          }}
+          ''')
+          PY
       - name: Require official app icon
         run: |
           test -f playstore-icon.png || (echo 'Upload playstore-icon.png to repository root first' && exit 1)
