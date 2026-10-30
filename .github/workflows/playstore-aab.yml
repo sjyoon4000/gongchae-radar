@@ -151,6 +151,18 @@ jobs:
           s=re.sub(r'compileSdkVersion\s*=\s*\d+','compileSdkVersion = 36',s)
           p.write_text(s)
           PY
+      - name: Meet Google Play minimum SDK requirement
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('android/variables.gradle')
+          s=p.read_text()
+          updated,n=re.subn(r'minSdkVersion\\s*=\\s*\\d+', 'minSdkVersion = 24', s)
+          assert n==1, f'Expected one minSdkVersion in {p}, found {n}'
+          p.write_text(updated)
+          print('Set minSdkVersion=24 for Google Play automatic protection')
+          PY
       - name: Build release bundle
         working-directory: android
         run: chmod +x gradlew && ./gradlew bundleRelease --no-daemon
