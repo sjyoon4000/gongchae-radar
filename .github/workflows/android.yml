@@ -28,7 +28,7 @@ jobs:
       - name: Apply custom launcher icon when available
         run: |
           if [ -f playstore-icon.png ]; then
-            python3 -m pip install Pillow
+            python3 -m pip install --user Pillow
             python3 - <<'PY'
             from PIL import Image
             from pathlib import Path
