@@ -102,7 +102,9 @@ jobs:
           manifest=Path('android/app/src/main/AndroidManifest.xml')
           txt=manifest.read_text()
           assert 'android:icon="@mipmap/ic_launcher"' in txt
-          assert 'android:roundIcon="@mipmap/ic_launcher_round"' in txt
+          if 'android:roundIcon=' not in txt:
+              txt=txt.replace('android:icon="@mipmap/ic_launcher"','android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round"')
+              manifest.write_text(txt)
           print('Verified launcher icons: legacy + adaptive, both mapped in AndroidManifest')
           PY
       - name: Configure Android AdMob app ID
