@@ -25,21 +25,19 @@ jobs:
         run: npm install
       - name: Create Android project
         run: npx cap add android
-      - name: Apply custom launcher icon when available
+      - name: Apply custom launcher icon
         run: |
-          if [ -f playstore-icon.png ]; then
-            python3 -m pip install --user Pillow
-            python3 - <<'PY'
-            from PIL import Image
-            from pathlib import Path
-            im=Image.open('playstore-icon.png').convert('RGBA')
-            for density,px in [('mdpi',48),('hdpi',72),('xhdpi',96),('xxhdpi',144),('xxxhdpi',192)]:
-                p=Path(f'android/app/src/main/res/mipmap-{density}')
-                p.mkdir(parents=True,exist_ok=True)
-                im.resize((px,px),Image.Resampling.LANCZOS).save(p/'ic_launcher.png')
-                im.resize((px,px),Image.Resampling.LANCZOS).save(p/'ic_launcher_round.png')
-            PY
-          fi
+          python3 -m pip install --user Pillow
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          im=Image.open('playstore-icon.png').convert('RGBA')
+          for density,px in [('mdpi',48),('hdpi',72),('xhdpi',96),('xxhdpi',144),('xxxhdpi',192)]:
+              p=Path(f'android/app/src/main/res/mipmap-{density}')
+              p.mkdir(parents=True,exist_ok=True)
+              im.resize((px,px),Image.Resampling.LANCZOS).save(p/'ic_launcher.png')
+              im.resize((px,px),Image.Resampling.LANCZOS).save(p/'ic_launcher_round.png')
+          PY
       - name: Configure Android AdMob app ID
         run: |
           python3 - <<'PY'
