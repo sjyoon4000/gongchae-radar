@@ -58,7 +58,7 @@ jobs:
                   ViewCompat.setOnApplyWindowInsetsListener(content, (v, insets) -> {{
                       androidx.core.graphics.Insets nav=insets.getInsets(
                           WindowInsetsCompat.Type.navigationBars());
-                      v.setPadding(0, 0, 0, nav.bottom);
+                      androidx.core.graphics.Insets status=insets.getInsets(\n                          WindowInsetsCompat.Type.statusBars());\n                      v.setPadding(0, status.top, 0, nav.bottom);
                       return insets;
                   }});
                   ViewCompat.requestApplyInsets(content);
@@ -175,6 +175,70 @@ jobs:
           assert n==1, f'Expected one versionCode, found {n}'
           p.write_text(updated)
           print(f'Play Store versionCode={code}')
+          PY
+      - name: Enable R8 code shrinking and optimization
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('android/app/build.gradle')
+          s=p.read_text()
+          match=re.search(r'(release\\s*\\{)',s)
+          assert match, 'Cannot find release build type'
+          # Capacitor-generated release configuration may have minifyEnabled false.
+          start=match.end()
+          s=s[:start]+'''
+                  minifyEnabled true
+                  shrinkResources true
+          '''+s[start:]
+          s=re.sub(r'(?m)^\\s*minifyEnabled\\s+false\\s*
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew bundleRelease --no-daemon
+      - name: Sign bundle with upload key (when configured)
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo 'No signing secrets. Bundle is unsigned and cannot be submitted to Play.'
+            exit 0
+          fi
+          printf '%s' "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          jarsigner -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" -signedjar android/app/build/outputs/bundle/release/app-release-signed.aab android/app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
+          jarsigner -verify android/app/build/outputs/bundle/release/app-release-signed.aab
+          rm -f "$RUNNER_TEMP/upload.jks"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gongchae-radar-playstore-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+, '', s)
+          s=re.sub(r'(?m)^\\s*shrinkResources\\s+false\\s*
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew bundleRelease --no-daemon
+      - name: Sign bundle with upload key (when configured)
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo 'No signing secrets. Bundle is unsigned and cannot be submitted to Play.'
+            exit 0
+          fi
+          printf '%s' "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          jarsigner -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" -signedjar android/app/build/outputs/bundle/release/app-release-signed.aab android/app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
+          jarsigner -verify android/app/build/outputs/bundle/release/app-release-signed.aab
+          rm -f "$RUNNER_TEMP/upload.jks"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gongchae-radar-playstore-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+, '', s)
+          p.write_text(s)
+          print('R8 minifyEnabled and shrinkResources enabled')
           PY
       - name: Build release bundle
         working-directory: android
