@@ -34,7 +34,7 @@ jobs:
           assert len(files)==1, f'Expected one MainActivity.java, got {files}'
           p=files[0]
           src=p.read_text()
-          package=re.search(r'^package\\s+([\\w.]+);',src,re.M)
+          package=re.search(r'^package\s+([\w.]+);',src,re.M)
           assert package, 'Cannot identify Android package'
           p.write_text(f'''package {package.group(1)};
 
