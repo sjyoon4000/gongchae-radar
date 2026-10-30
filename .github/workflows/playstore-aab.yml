@@ -39,7 +39,6 @@ jobs:
           import android.os.Bundle;
           import android.view.View;
           import androidx.core.view.ViewCompat;
-          import androidx.core.view.WindowCompat;
           import androidx.core.view.WindowInsetsCompat;
           import com.getcapacitor.BridgeActivity;
 
@@ -47,9 +46,6 @@ jobs:
               @Override
               public void onCreate(Bundle savedInstanceState) {{
                   super.onCreate(savedInstanceState);
-                  WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-                  getWindow().setStatusBarColor(0xFF0F172A);
-                  getWindow().getDecorView().setSystemUiVisibility(0);
                   View webView=getBridge().getWebView();
                   webView.setBackgroundColor(0xFF0F172A);
                   // Keep the original edge-to-edge status bar appearance as requested.
@@ -183,62 +179,16 @@ jobs:
           import re
           p=Path('android/app/build.gradle')
           s=p.read_text()
-          match=re.search(r'(release\\s*\\{)',s)
+          match=re.search(r'release\s*\{',s)
           assert match, 'Cannot find release build type'
-          # Capacitor-generated release configuration may have minifyEnabled false.
-          start=match.end()
-          s=s[:start]+'''
+          s=s[:match.end()]+'''
                   minifyEnabled true
                   shrinkResources true
-          '''+s[start:]
-          s=re.sub(r'(?m)^\\s*minifyEnabled\\s+false\\s*
-        working-directory: android
-        run: chmod +x gradlew && ./gradlew bundleRelease --no-daemon
-      - name: Sign bundle with upload key (when configured)
-        env:
-          KEYSTORE_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          if [ -z "$KEYSTORE_B64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
-            echo 'No signing secrets. Bundle is unsigned and cannot be submitted to Play.'
-            exit 0
-          fi
-          printf '%s' "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
-          jarsigner -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" -signedjar android/app/build/outputs/bundle/release/app-release-signed.aab android/app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
-          jarsigner -verify android/app/build/outputs/bundle/release/app-release-signed.aab
-          rm -f "$RUNNER_TEMP/upload.jks"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: gongchae-radar-playstore-aab
-          path: android/app/build/outputs/bundle/release/*.aab
-, '', s)
-          s=re.sub(r'(?m)^\\s*shrinkResources\\s+false\\s*
-        working-directory: android
-        run: chmod +x gradlew && ./gradlew bundleRelease --no-daemon
-      - name: Sign bundle with upload key (when configured)
-        env:
-          KEYSTORE_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          if [ -z "$KEYSTORE_B64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
-            echo 'No signing secrets. Bundle is unsigned and cannot be submitted to Play.'
-            exit 0
-          fi
-          printf '%s' "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
-          jarsigner -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" -signedjar android/app/build/outputs/bundle/release/app-release-signed.aab android/app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
-          jarsigner -verify android/app/build/outputs/bundle/release/app-release-signed.aab
-          rm -f "$RUNNER_TEMP/upload.jks"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: gongchae-radar-playstore-aab
-          path: android/app/build/outputs/bundle/release/*.aab
-, '', s)
+          '''+s[match.end():]
+          s=s.replace('minifyEnabled false','// minifyEnabled false')
+          s=s.replace('shrinkResources false','// shrinkResources false')
           p.write_text(s)
-          print('R8 minifyEnabled and shrinkResources enabled')
+          print('Enabled R8 and resource shrinking')
           PY
       - name: Build release bundle
         working-directory: android
