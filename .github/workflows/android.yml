@@ -56,7 +56,8 @@ jobs:
                   ViewCompat.setOnApplyWindowInsetsListener(content, (v, insets) -> {{
                       androidx.core.graphics.Insets nav=insets.getInsets(
                           WindowInsetsCompat.Type.navigationBars());
-                      androidx.core.graphics.Insets status=insets.getInsets(\n                          WindowInsetsCompat.Type.statusBars());\n                      v.setPadding(0, status.top, 0, nav.bottom);
+                      androidx.core.graphics.Insets status=insets.getInsets(\n                          WindowInsetsCompat.Type.statusBars());
+                      v.setPadding(0, status.top, 0, nav.bottom);
                       return insets;
                   }});
                   ViewCompat.requestApplyInsets(content);
