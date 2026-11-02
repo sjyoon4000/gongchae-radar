@@ -2,7 +2,7 @@ name: Update Cartok bond quotes
 
 on:
   schedule:
-    - cron: '15 1,3,5,7,9 * * 1-5'
+    - cron: '0,5,10,15 0 * * 1-5'
   workflow_dispatch:
 
 permissions:
