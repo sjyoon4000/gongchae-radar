@@ -2,7 +2,7 @@ name: Update Cartok bond quotes
 
 on:
   schedule:
-    - cron: '0,5,10,15 0 * * 1-5'
+    - cron: '0,5,10,15,20,25,30,35,40,45,50,55 0,1 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -26,6 +26,8 @@ jobs:
         run: pip install requests beautifulsoup4
       - name: Fetch and validate latest Cartok quotes
         run: python update_quotes.py
+      - name: Show fetched quote date
+        run: python -c "import json; d=json.load(open('data.json')); print('Quote date:', d['market']['date'], 'Collected:', d['market'].get('collectedAt'))"
       - name: Commit verified quote changes
         run: |
           if git diff --quiet -- data.json; then
