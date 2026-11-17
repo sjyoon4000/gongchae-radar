@@ -1,12 +1,12 @@
 {
-  "version": "2026-11-16-cartok",
+  "version": "2026-11-17-cartok",
   "market": {
-    "date": "2026-11-16",
-    "metro": 14.897,
-    "regional": 10.603,
+    "date": "2026-11-17",
+    "metro": 14.851,
+    "regional": 10.567,
     "source": "Cartok 공채정보 (자동 수집 · 지역별 실제 할인율 차이 유의)",
     "verifiedAutomated": true,
-    "collectedAt": "2026-11-17T09:00:41+09:00"
+    "collectedAt": "2026-11-17T09:05:24+09:00"
   },
   "regions": {
     "서울": {
@@ -617,6 +617,11 @@
     }
   },
   "history": [
+    {
+      "date": "2026-11-17",
+      "metro": 14.851,
+      "regional": 10.567
+    },
     {
       "date": "2026-11-16",
       "metro": 14.897,
